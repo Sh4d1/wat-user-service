@@ -9,12 +9,12 @@ import (
 )
 
 type service struct {
-	db           Database
+	repo         repository
 	tokenService Authable
 }
 
 func (s *service) Get(ctx context.Context, req *pb.User, res *pb.Response) error {
-	user, err := s.db.Get(req.Id)
+	user, err := s.repo.Get(req.Id)
 	if err != nil {
 		return err
 	}
@@ -23,7 +23,7 @@ func (s *service) Get(ctx context.Context, req *pb.User, res *pb.Response) error
 }
 
 func (s *service) GetAll(ctx context.Context, req *pb.Request, res *pb.Response) error {
-	users, err := s.db.GetAll()
+	users, err := s.repo.GetAll()
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (s *service) GetAll(ctx context.Context, req *pb.Request, res *pb.Response)
 
 func (s *service) Auth(ctx context.Context, req *pb.User, res *pb.Response) error {
 	log.Println("Logging in with:", req.Email, req.Password)
-	user, err := s.db.GetByEmailAndPassword(req)
+	user, err := s.repo.GetByEmailAndPassword(req)
 	log.Println(user)
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func (s *service) Create(ctx context.Context, req *pb.User, res *pb.Response) er
 		return err
 	}
 	req.Password = string(hashedPass)
-	if err := s.db.Create(req); err != nil {
+	if err := s.repo.Create(req); err != nil {
 		return err
 	}
 	res.User = req
