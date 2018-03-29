@@ -2,9 +2,11 @@ package main
 
 import (
 	"log"
+	"os"
 
 	pb "github.com/Sh4d1/wat-user-service/proto/user"
 	micro "github.com/micro/go-micro"
+	k8s "github.com/micro/kubernetes/go/micro"
 )
 
 func main() {
@@ -17,19 +19,29 @@ func main() {
 
 	db.AutoMigrate(&pb.User{})
 
-	database := &UserDatabase{db}
+	repo := &UserRepository{db}
 
-	tokenService := &TokenService{database}
+	tokenService := &TokenService{repo}
 
-	service := micro.NewService(
-		micro.Name("wat.user"),
-	)
+	var srv micro.Service
 
-	service.Init()
+	if os.Getenv("DEV") == "true" {
+		srv = micro.NewService(
+			micro.Name("wat.user"),
+		)
+	} else {
+		srv = k8s.NewService(
+			micro.Name("go.micro.api.user"),
+		)
+	}
+	srv.Init()
 
-	pb.RegisterUserHandler(service.Server(), &service{database, tokenService})
+	pb.RegisterUserServiceHandler(srv.Server(), &service{
+		repo:         repo,
+		tokenService: tokenService,
+	})
 
-	if err := service.Run(); err != nil {
+	if err := srv.Run(); err != nil {
 		log.Fatal(err)
 	}
 }
