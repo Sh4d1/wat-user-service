@@ -1,0 +1,35 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+    name: postgres
+spec:
+    selector:
+        matchLabels:
+            app: postgres
+    replicas: 1
+    template:
+        metadata:
+            labels:
+                app: postgres
+                role: postgres
+        spec:
+            terminationGracePeriodSeconds: 10
+            containers:
+                - name: postgres
+                  image: postgres
+                  ports:
+                      - name: postgres
+                        containerPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata: 
+    name: postgres
+    labels:
+        app: postgres
+spec:
+    ports:
+        - name: postgres
+          port: 5432
+    selector:
+        role: postgres
