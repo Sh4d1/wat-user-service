@@ -31,7 +31,7 @@ func main() {
 		)
 	} else {
 		srv = k8s.NewService(
-			micro.Name("go.micro.api.user"),
+			micro.Name("wat.user"),
 		)
 	}
 	srv.Init()
