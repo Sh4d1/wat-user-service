@@ -1,0 +1,13 @@
+pipeline:
+    docker:
+        image: plugins/docker
+        repo: sh4d1/wat-user-service
+        tags: 
+          - ${DRONE_COMMIT_SHA}
+          - latest
+        username: sh4d1
+        secrets: [ docker_password ] 
+    deploy:
+        image: sh4d1/drone-kubernetes
+        kubernetes_template: deployments/user.yml
+        secrets: [kubernetes_server, kubernetes_cert, kubernetes_token]

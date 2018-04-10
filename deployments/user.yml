@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
     name: user
@@ -14,7 +14,7 @@ spec:
         spec:
             containers:
                 - name: user-service
-                  image: sh4d1/wat-user-service
+                  image: sh4d1/wat-user-service:{{ build.commit }}
                   imagePullPolicy: Always
                   command: [
                       "./wat-user-service",
