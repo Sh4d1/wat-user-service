@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"time"
 
 	pb "github.com/Sh4d1/wat-user-service/proto/user"
@@ -30,9 +31,14 @@ func (s *TokenService) Decode(tokenString string) (*CustomClaims, error) {
 		return key, nil
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
 		return claims, nil
 	} else {
+		log.Println(err)
 		return nil, err
 	}
 }
